@@ -148,6 +148,11 @@ class VideoIngestor:
         if src_path.exists():
             return src_path.resolve()
 
+        # 幂等：work_dir 已存在上次下载的 source.mp4 时直接复用，避免重复下载
+        cached = work_dir / "source.mp4"
+        if cached.exists():
+            return cached
+
         import yt_dlp
 
         opts = {
@@ -203,17 +208,20 @@ class VideoIngestor:
     # ------------------------------------------------------------------ #
     def _transcribe(self, audio_path: Path, video_id: str) -> Transcript:
         try:
-            import whisper
-        except ImportError as exc:  # 延迟导入，避免未装 torch/whisper 时影响抽帧测试
+            from faster_whisper import WhisperModel
+        except ImportError as exc:  # 延迟导入，避免未装 faster-whisper 时影响抽帧测试
             raise RuntimeError(
-                "未安装 openai-whisper，请先执行 pip install openai-whisper"
+                "未安装 faster-whisper，请先执行 pip install faster-whisper"
             ) from exc
 
-        model = whisper.load_model(self.whisper_model)
-        result = model.transcribe(str(audio_path), language=self.language)
+        # int8 量化在 CPU 上速度快、内存占用低；vad_filter 自动跳过静音段
+        model = WhisperModel(self.whisper_model, device="cpu", compute_type="int8")
+        segments_iter, _ = model.transcribe(
+            str(audio_path), language=self.language, vad_filter=True, beam_size=5
+        )
         segments = [
-            TranscriptSegment(start=float(s["start"]), end=float(s["end"]), text=str(s["text"]).strip())
-            for s in result.get("segments", [])
+            TranscriptSegment(start=float(s.start), end=float(s.end), text=str(s.text).strip())
+            for s in segments_iter
         ]
         return Transcript(video_id=video_id, language=self.language, model=self.whisper_model, segments=segments)
 

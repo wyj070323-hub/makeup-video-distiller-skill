@@ -17,8 +17,8 @@ Python 依赖（轻量核心）：
 
 ```bash
 pip install -r requirements.txt
-# 若需字幕转写，再装（含 PyTorch，较大）：
-pip install openai-whisper
+# 若需字幕转写，再装 faster-whisper（ctranslate2，CPU 快；首次运行会下载模型）：
+pip install "faster-whisper" "av<19"
 ```
 
 ## 2. 中间态数据契约（与成员 B 约定）
@@ -69,8 +69,8 @@ python examples/test_ingest_local.py  # 需先装 ffmpeg
 ## 5. 打包 / 容器
 
 ```bash
-pip install -e .            # 轻量安装（不含 whisper）
-pip install -e ".[full]"    # 含 whisper（PyTorch，体积大）
+pip install -e .            # 轻量安装（不含转写）
+pip install -e ".[full]"    # 含 faster-whisper 转写
 docker build -t makeup-distiller .
 ```
 

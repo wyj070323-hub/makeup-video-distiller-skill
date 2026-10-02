@@ -1,5 +1,4 @@
-# 美妆视频蒸馏 Skill —— 完整运行环境（含 ffmpeg + PyTorch/Whisper）
-# 用 3.11 而非最新版：openai-whisper 的 numba/torch 依赖对 3.11 兼容性最稳。
+# 美妆视频蒸馏 Skill —— 完整运行环境（含 ffmpeg + faster-whisper 转写）
 FROM python:3.11-slim
 
 # 1) 系统级依赖：ffmpeg（ffprobe 随附）
@@ -9,10 +8,10 @@ RUN apt-get update \
 
 WORKDIR /app
 
-# 2) 先装依赖（利用 Docker layer cache，源码变动不重装 torch）
+# 2) 先装依赖（利用 Docker layer cache，源码变动不重装转写依赖）
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir openai-whisper
+    && pip install --no-cache-dir "faster-whisper" "av<19"
 
 # 3) 拷贝源码并本地安装
 COPY . .

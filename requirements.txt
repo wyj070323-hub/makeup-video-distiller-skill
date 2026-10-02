@@ -4,8 +4,10 @@ ffmpeg-python>=0.2.0
 Pillow>=10.4.0
 pydantic>=2.8.0
 
-# ===== 字幕转写（重量级，含 PyTorch；如需离线开发可先跳过） =====
-# openai-whisper>=20231117
+# ===== 字幕转写（faster-whisper，ctranslate2，CPU 快；首次运行会下载模型） =====
+# faster-whisper>=1.0.0
+# 依赖注意：faster-whisper 1.2.x 调用 av.open(metadata_errors=...)，PyAV 19.0.0 已删除该参数，
+# 需约束 av<19（Windows/Python 3.13 实际可用 av==16.1.0，17/18 无 cp313 轮子）。
 
 # 注意：ffmpeg 是系统级依赖，不是 pip 包，需单独安装：
 #   Windows: winget install Gyan.FFmpeg

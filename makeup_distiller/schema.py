@@ -81,3 +81,49 @@ class DistillationResult(BaseModel):
         default_factory=list, description='适合特征，如"肿眼泡"、"内双"'
     )
     sop_steps: List[SOPStep] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
+# 妆容风格分类法（受控词表，数据见 makeup_distiller/taxonomy.json）
+# ---------------------------------------------------------------------------
+
+class MakeupStyle(BaseModel):
+    """单个妆容风格条目，对应 taxonomy.json 中 styles 的一项。"""
+    id: str = Field(..., description="稳定 slug，如 korean")
+    name: str = Field(..., description="风格名，如 韩式妆")
+    aliases: List[str] = Field(default_factory=list, description="别名")
+    style_archetypes: List[str] = Field(
+        default_factory=list,
+        description="适合风格：古典/自然/优雅/浪漫/少年/少女/前卫/戏剧/时尚",
+    )
+    bone_mass: List[str] = Field(
+        default_factory=list, description="量感：小量感/中量感/大量感"
+    )
+    bone_texture: List[str] = Field(
+        default_factory=list, description="骨骼质感：骨感/肉感/适中"
+    )
+    face_type: str = Field("", description="浓淡颜：浓颜系/淡颜系/浓淡皆可")
+    essence: List[str] = Field(default_factory=list, description="妆容要点关键词")
+    attributes_complete: bool = Field(False, description="是否已从原始笔记补齐属性")
+    covered_video: Optional[str] = Field(None, description="已覆盖该风格的视频 video_id")
+    coverage: str = Field("missing", description="covered / partial / missing")
+    notes: str = Field("", description="备注（OCR 存疑、映射说明等）")
+
+
+class StyleTaxonomy(BaseModel):
+    """完整妆容风格分类法。"""
+    version: str = "1.0"
+    updated_at: str = ""
+    note: str = ""
+    attribute_axes: dict = Field(default_factory=dict, description="属性轴取值表")
+    styles: List[MakeupStyle] = Field(default_factory=list)
+
+
+def load_taxonomy() -> StyleTaxonomy:
+    """读取随包分发的 taxonomy.json，返回校验后的 StyleTaxonomy。"""
+    import json
+    from pathlib import Path
+
+    path = Path(__file__).parent / "taxonomy.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return StyleTaxonomy.model_validate(data)

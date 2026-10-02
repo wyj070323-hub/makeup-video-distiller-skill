@@ -8,9 +8,12 @@ from .schema import (
     DistillationResult,
     FrameInfo,
     IngestManifest,
+    MakeupStyle,
     SOPStep,
+    StyleTaxonomy,
     Transcript,
     TranscriptSegment,
+    load_taxonomy,
 )
 
 __all__ = [
@@ -22,4 +25,7 @@ __all__ = [
     "TranscriptSegment",
     "SOPStep",
     "DistillationResult",
+    "MakeupStyle",
+    "StyleTaxonomy",
+    "load_taxonomy",
 ]

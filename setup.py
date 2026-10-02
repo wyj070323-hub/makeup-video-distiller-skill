@@ -14,9 +14,11 @@ setup(
         "pillow",
     ],
     extras_require={
-        # openai-whisper 依赖 PyTorch（体积大），单独放 extras，便于轻量迭代：
+        # faster-whisper（ctranslate2）依赖较重，单独放 extras，便于轻量迭代：
         #   pip install -e ".[full]"
-        "full": ["openai-whisper>=20231117"],
+        # 注意：faster-whisper 1.2.x 会调 av.open(..., metadata_errors="ignore")，
+        # 该参数在 PyAV 19.0.0 已被移除，故显式约束 av<19，避免转写时报 TypeError。
+        "full": ["faster-whisper>=1.0.0", "av>=11.0,<19.0"],
     },
     entry_points={
         "console_scripts": [
