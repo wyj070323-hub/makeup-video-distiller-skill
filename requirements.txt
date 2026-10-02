@@ -1,0 +1,13 @@
+# ===== 成员 A · 预处理核心（轻量，必装） =====
+yt-dlp>=2024.8.6
+ffmpeg-python>=0.2.0
+Pillow>=10.4.0
+pydantic>=2.8.0
+
+# ===== 字幕转写（重量级，含 PyTorch；如需离线开发可先跳过） =====
+# openai-whisper>=20231117
+
+# 注意：ffmpeg 是系统级依赖，不是 pip 包，需单独安装：
+#   Windows: winget install Gyan.FFmpeg
+#   macOS:   brew install ffmpeg
+#   Ubuntu:  sudo apt-get install -y ffmpeg
